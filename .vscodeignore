@@ -3,9 +3,7 @@
 .github/**
 node_modules/**
 scripts/**
-src/**
 test/**
-upstream/**
 *.vsix
 *.md
 !README.md

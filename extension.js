@@ -1,14 +1,15 @@
 'use strict';
 
 /**
- * Mori Gruvbox - extension host entry.
+ * Mozg (VS) Code - Theme Extension: extension host entry.
  *
- * Ships one theme ("Mori Gruvbox", declared in package.json) and the Mori
- * bridge: a one-time patch of the Mozg webview stylesheet that makes Mozg use
- * the colors of whatever VS Code theme is active (see lib/bridge.js).
+ * Applies the Mori bridge - a patch of the Mozg webview stylesheet that makes
+ * Mozg use the colors of whatever VS Code theme is active (see lib/bridge.js).
  *
  * Mozg is a separate extension, so we only touch its files with consent:
  * moriGruvbox.mozgBridge = "ask" (default) | "auto" | "off".
+ * (The setting and command ids keep their original "moriGruvbox" prefix so
+ * that existing user settings continue to work.)
  */
 
 const fs = require('fs');
@@ -18,8 +19,7 @@ const bridge = require('./lib/bridge');
 
 const MOZG_ID = 'mori-ai.mori-code';
 const SETTING = 'mozgBridge';
-const LEGACY_THEME = 'Mori Gruvbox Dark Hard';
-const THEME = 'Mori Gruvbox';
+const TITLE = 'Mozg Theme';
 
 const REASONS = {
 	unsupported:
@@ -54,17 +54,17 @@ async function offerReload(text) {
 async function applyBridge(context, mozg) {
 	const result = bridge.apply(mozg.cssPath, readTemplate(context));
 	if (result.state === 'unsupported') {
-		vscode.window.showWarningMessage(`Mori Gruvbox: ${REASONS.unsupported}`);
+		vscode.window.showWarningMessage(`${TITLE}: ${REASONS.unsupported}`);
 		return false;
 	}
 	if (result.state === 'missing') {
-		vscode.window.showWarningMessage('Mori Gruvbox: the Mozg stylesheet was not found.');
+		vscode.window.showWarningMessage(`${TITLE}: the Mozg stylesheet was not found.`);
 		return false;
 	}
 	if (result.changed) {
-		await offerReload('Mori Gruvbox: Mozg now follows your VS Code theme. Reload the window to see it.');
+		await offerReload(`${TITLE}: Mozg now follows your VS Code theme. Reload the window to see it.`);
 	} else {
-		vscode.window.showInformationMessage('Mori Gruvbox: the Mozg bridge is already up to date.');
+		vscode.window.showInformationMessage(`${TITLE}: the Mozg bridge is already up to date.`);
 	}
 	return result.changed;
 }
@@ -91,7 +91,7 @@ async function ensureBridge(context) {
 	if (status.state === 'unsupported') {
 		if (!context.globalState.get(noticeKey)) {
 			await context.globalState.update(noticeKey, true);
-			vscode.window.showWarningMessage(`Mori Gruvbox: ${REASONS.unsupported}`);
+			vscode.window.showWarningMessage(`${TITLE}: ${REASONS.unsupported}`);
 		}
 		return;
 	}
@@ -112,9 +112,9 @@ async function ensureBridge(context) {
 	const notNow = 'Not now';
 	const never = 'Never';
 	const choice = await vscode.window.showInformationMessage(
-		'Mori Gruvbox can make Mozg use the colors of your current VS Code theme. ' +
+		`${TITLE} can make Mozg use the colors of your current VS Code theme. ` +
 			'This edits one stylesheet inside the Mozg extension (a backup is kept; ' +
-			'"Mori Gruvbox: Revert Mozg Bridge" undoes it).',
+			`"${TITLE}: Revert Mozg Bridge" undoes it).`,
 		apply,
 		always,
 		notNow,
@@ -133,18 +133,10 @@ async function ensureBridge(context) {
 	}
 }
 
-/** The theme used to be called "Mori Gruvbox Dark Hard"; follow the rename. */
-async function migrateThemeName() {
-	const config = vscode.workspace.getConfiguration('workbench');
-	if (config.get('colorTheme') === LEGACY_THEME) {
-		await config.update('colorTheme', THEME, vscode.ConfigurationTarget.Global);
-	}
-}
-
 function withMozg(action) {
 	const mozg = getMozg();
 	if (!mozg) {
-		vscode.window.showWarningMessage('Mori Gruvbox: the Mozg extension (mori-ai.mori-code) is not installed.');
+		vscode.window.showWarningMessage(`${TITLE}: the Mozg extension (${MOZG_ID}) is not installed.`);
 		return undefined;
 	}
 	return action(mozg);
@@ -159,17 +151,17 @@ function activate(context) {
 			withMozg(async (mozg) => {
 				const result = bridge.revert(mozg.cssPath);
 				if (!result.changed) {
-					vscode.window.showInformationMessage('Mori Gruvbox: the Mozg stylesheet has no bridge to revert.');
+					vscode.window.showInformationMessage(`${TITLE}: the Mozg stylesheet has no bridge to revert.`);
 					return;
 				}
-				await offerReload('Mori Gruvbox: the Mozg stylesheet is back to its original state.');
+				await offerReload(`${TITLE}: the Mozg stylesheet is back to its original state.`);
 			})
 		),
 		vscode.commands.registerCommand('moriGruvbox.showMozgBridgeStatus', () =>
 			withMozg((mozg) => {
 				const status = bridge.getStatus(mozg.cssPath, readTemplate(context));
 				vscode.window.showInformationMessage(
-					`Mori Gruvbox: Mozg ${mozg.version} - bridge state: ${status.state}` +
+					`${TITLE}: Mozg ${mozg.version} - bridge state: ${status.state}` +
 						(status.overrides === undefined ? '' : ` (${status.overrides} theme variables handed back)`)
 				);
 			})
@@ -178,15 +170,12 @@ function activate(context) {
 
 	// Mozg may activate after us; give it a moment, but never block startup.
 	const timer = setTimeout(() => {
-		ensureBridge(context).catch((error) => console.error('[mori-gruvbox]', error));
+		ensureBridge(context).catch((error) => console.error('[mozg-theme]', error));
 	}, 1500);
 	context.subscriptions.push({ dispose: () => clearTimeout(timer) });
-
-	migrateThemeName().catch((error) => console.error('[mori-gruvbox]', error));
 }
 
 function deactivate() {}
 
 // `_internal` is exposed for tests only.
-module.exports = { activate, deactivate, _internal: { ensureBridge, migrateThemeName, applyBridge } };
-
+module.exports = { activate, deactivate, _internal: { ensureBridge, applyBridge } };

@@ -61,4 +61,23 @@ body {
 [style*="linear-gradient"]:not([style*="mask"]):not([style*="96%"]) {
 	background-image: none !important;
 }
+
+/* The "Mozg" brand mark: a rounded square drawn as one path tinted with
+   --mori-accent and a second path holding the "M" glyph. Since the accent now
+   follows the theme, the square would pick up the theme's accent color.
+   The mark is pinned to a single flat color instead, so it reads as the plain
+   rounded square used on mozg.world (the glyph shares the fill, which makes it
+   blend into the square rather than standing out).
+   All three instances of the mark share viewBox "-48 -48 773 773" - that is
+   the signature used here, because only one of them carries <title>/role. */
+svg[viewBox="-48 -48 773 773"] path {
+	fill: #ffffff !important;
+}
+
+/* On light themes a white mark would vanish into the light sidebar, so it
+   switches to the ink color the mark uses in Mozg's own icon assets. */
+.vscode-light svg[viewBox="-48 -48 773 773"] path,
+.vscode-high-contrast-light svg[viewBox="-48 -48 773 773"] path {
+	fill: #1c1c24 !important;
+}
 /* ===== MORI BRIDGE END ===== */

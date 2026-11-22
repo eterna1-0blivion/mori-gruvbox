@@ -33,7 +33,7 @@ function parse(argv) {
 
 const NOTES = {
 	none: 'bridge not applied',
-	legacy: 'old 1.x neutral patch present (apply replaces it)',
+	legacy: 'patch from the pre-extension script present (apply replaces it)',
 	outdated: 'bridge present but differs from this version (apply updates it)',
 	current: 'bridge applied',
 	unsupported: 'stylesheet layout not recognised - left untouched',

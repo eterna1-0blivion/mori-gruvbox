@@ -1,51 +1,37 @@
-Mori Gruvbox
-============
+Mozg (VS) Code - Theme Extension
+================================
 
-This project is a derivative work. It reuses colors and syntax rules from
-the themes listed below. Their licenses and copyright notices are retained.
-
-1. Gruvbox for Visual Studio Code
----------------------------------
-upstream/gruvbox-dark-hard.json
-themes/mori-gruvbox.json (derived)
-
-    Copyright (c) 2017 JD
-    Source:  https://github.com/jdinhify/vscode-theme-gruvbox
-    License: MIT (full text in upstream/LICENSE.txt)
-
-    tokenColors and semanticTokenColors are taken unmodified. A subset of the
-    UI colors is reused as well (see scripts/build-theme.mjs).
-
-2. Gruvbox color palette
-------------------------
-The Gruvbox color palette was created by Pavel Pertsev (morhetz).
-
-    Source:  https://github.com/morhetz/gruvbox
-    License: MIT
-
-3. Visual Studio Code "Dark Modern" theme
-----------------------------------------
-upstream/dark-modern.json
-themes/mori-gruvbox.json (derived)
-
-    Copyright (c) 2015 - present Microsoft Corporation
-    Source:  https://github.com/microsoft/vscode
-    License: MIT (full text in upstream/LICENSE-vscode.txt)
-
-    The UI colors of the Mori Gruvbox theme are taken from the built-in
-    "Dark Modern" theme (colors only, flattened by scripts/vendor-dark-modern.mjs).
-
-4. Mozg / mori-code integration
--------------------------------
+1. Mozg
+-------
 lib/bridge.template.css restyles the webview of the "Mozg" extension
-(publisher mori-ai, id mori-code) at the user request, by editing one
+(publisher mori-ai, id mori-code) at the user's request, by editing one
 stylesheet in the local installation. Mozg itself is not redistributed here.
 This project is not affiliated with or endorsed by Mozg AI; it can undo its
-change at any time ("Mori Gruvbox: Revert Mozg Bridge").
+change at any time ("Mozg Theme: Revert Mozg Bridge").
 
-5. This project
+The shape in assets/icon.png is the outline of the Mozg mark (a rounded
+square, without the letter). The mark belongs to its owners.
+
+2. Test fixtures (test/fixtures/themes/, not shipped in the extension)
+-----------------------------------------------------------------------
+Small subsets of theme colors, used to check that the bridge follows a theme:
+
+  dark-modern.json, light-modern.json
+    Colors of the VS Code built-in themes "Dark Modern" / "Light Modern".
+    Copyright (c) 2015 - present Microsoft Corporation, MIT.
+    Source: https://github.com/microsoft/vscode  (LICENSE-vscode.txt)
+
+  gruvbox-dark-hard.json
+    Colors of "Gruvbox Dark Hard" for Visual Studio Code.
+    Copyright (c) 2017 JD, MIT.
+    Source: https://github.com/jdinhify/vscode-theme-gruvbox  (LICENSE-gruvbox.txt)
+    The palette itself was created by Pavel Pertsev (morhetz), MIT,
+    https://github.com/morhetz/gruvbox
+
+3. This project
 ---------------
-Everything else (extension code, bridge, tests, scripts, icon, documentation):
+Everything else (extension code, bridge, tests, scripts, icon generator,
+documentation):
 
-    Copyright (c) 2026 eterna1-0blivion
-    License: MIT (full text in LICENSE)
+  Copyright (c) 2026 eterna1-0blivion
+  License: MIT (full text in LICENSE)

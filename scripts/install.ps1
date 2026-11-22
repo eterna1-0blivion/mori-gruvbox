@@ -1,26 +1,20 @@
 ﻿<#
 .SYNOPSIS
-    Собирает и устанавливает расширение Mori Gruvbox в VS Code.
+    Собирает и устанавливает расширение "Mozg (VS) Code - Theme Extension".
 
 .DESCRIPTION
     Упаковывает расширение в .vsix и ставит его через официальный CLI.
-    Само расширение при запуске предложит подключить Mozg к активной теме
-    (команда "Mori Gruvbox: Apply Mozg Bridge"), поэтому отдельный патч
-    больше не нужен. Эта обёртка нужна только для установки из исходников.
-
-    settings.json не меняется. Активной тема становится только при -SetActive.
+    При запуске расширение само предложит подключить Mozg к активной теме
+    (команда "Mozg Theme: Apply Mozg Bridge"). Эта обёртка нужна только для
+    установки из исходников; settings.json она не трогает.
 
 .PARAMETER Yes
     Не спрашивать подтверждение.
 
 .PARAMETER Uninstall
     Удалить расширение. Мост Mozg убирается командой
-    "Mori Gruvbox: Revert Mozg Bridge" (до удаления) или:
+    "Mozg Theme: Revert Mozg Bridge" (до удаления) или:
         node scripts/bridge-cli.js revert
-
-.PARAMETER SetActive
-    После установки сделать тему "Mori Gruvbox" активной (правит
-    workbench.colorTheme; бэкап settings.json.bak-mori-gruvbox).
 
 .PARAMETER CodeCommand
     Путь к code / code-insiders / codium.
@@ -38,13 +32,12 @@
     .\install.ps1
 
 .EXAMPLE
-    .\install.ps1 -Yes -SetActive
+    .\install.ps1 -Yes
 #>
 [CmdletBinding()]
 param(
     [switch]$Yes,
     [switch]$Uninstall,
-    [switch]$SetActive,
     [string]$CodeCommand,
     [string]$ExtensionsDir,
     [string]$UserDataDir,
@@ -56,7 +49,6 @@ $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent (Split-Path -Parent $PSCommandPath)
 $Package = Get-Content (Join-Path $Root 'package.json') -Raw | ConvertFrom-Json
 $ExtensionId = "$($Package.publisher).$($Package.name)"
-$ThemeName = 'Mori Gruvbox'
 
 function Write-Step($text) { Write-Host "`n== $text" -ForegroundColor Cyan }
 function Write-Ok($text) { Write-Host "   $text" -ForegroundColor Green }
@@ -96,39 +88,8 @@ function Resolve-CodeCommand {
     throw 'Не удалось найти редактор. Укажите путь через -CodeCommand.'
 }
 
-function Set-ActiveTheme([string]$Name) {
-    $settingsPath = Join-Path $env:APPDATA 'Code\User\settings.json'
-    if (-not (Test-Path -LiteralPath $settingsPath)) {
-        Write-Host "   settings.json не найден: $settingsPath" -ForegroundColor Yellow
-        return
-    }
-
-    $raw = [System.IO.File]::ReadAllText($settingsPath)
-    $pattern = '"workbench\.colorTheme"\s*:\s*"[^"]*"'
-    $replacement = '"workbench.colorTheme": "' + $Name + '"'
-
-    if ([regex]::IsMatch($raw, $pattern)) {
-        $updated = [regex]::Replace($raw, $pattern, $replacement, 1)
-    }
-    else {
-        $open = $raw.IndexOf('{')
-        if ($open -lt 0) { throw 'Некорректный settings.json: нет открывающей скобки.' }
-        $updated = $raw.Insert($open + 1, "`n    " + $replacement + ',')
-    }
-
-    # settings.json может содержать комментарии (JSONC). Windows PowerShell 5.1
-    # их не разбирает, поэтому корректность результата проверяет Node.
-    $check = 'try{new Function("return ("+require("fs").readFileSync(0,"utf8")+")")();process.exit(0)}catch(e){process.exit(1)}'
-    $updated | & node -e $check
-    if ($LASTEXITCODE -ne 0) { throw 'Правка settings.json дала бы некорректный файл - изменения не применены.' }
-
-    [System.IO.File]::WriteAllText("$settingsPath.bak-mori-gruvbox", $raw, [System.Text.UTF8Encoding]::new($false))
-    [System.IO.File]::WriteAllText($settingsPath, $updated, [System.Text.UTF8Encoding]::new($false))
-    Write-Ok "Активная тема: $Name (бэкап: settings.json.bak-mori-gruvbox)"
-}
-
 # --- Основной сценарий ------------------------------------------------------
-Write-Step "Mori Gruvbox $($Package.version)"
+Write-Step "$($Package.displayName) $($Package.version)"
 
 $code = Resolve-CodeCommand -Explicit $CodeCommand
 Write-Info "Редактор: $code"
@@ -142,19 +103,17 @@ if ($Uninstall) {
     & $code @cliArgs --uninstall-extension $ExtensionId
     if ($LASTEXITCODE -ne 0) { throw "code --uninstall-extension вернул код $LASTEXITCODE" }
     Write-Ok 'Расширение удалено.'
-    Write-Host '   Мост Mozg убирается командой "Mori Gruvbox: Revert Mozg Bridge" или:' -ForegroundColor DarkGray
+    Write-Host '   Мост Mozg убирается командой "Mozg Theme: Revert Mozg Bridge" или:' -ForegroundColor DarkGray
     Write-Host '   node scripts/bridge-cli.js revert' -ForegroundColor DarkGray
     return
 }
 
-$vsix = Join-Path $Root "mori-gruvbox-$($Package.version).vsix"
+$vsix = Join-Path $Root "$($Package.name)-$($Package.version).vsix"
 
 if (-not $SkipBuild) {
-    Write-Step 'Сборка'
+    Write-Step 'Упаковка'
     Push-Location $Root
     try {
-        & node 'scripts/build-theme.mjs'
-        if ($LASTEXITCODE -ne 0) { throw 'Сборка темы завершилась ошибкой.' }
         & npx --yes '@vscode/vsce' package --no-dependencies --out $vsix
         if ($LASTEXITCODE -ne 0) { throw 'Упаковка .vsix завершилась ошибкой.' }
     }
@@ -172,11 +131,6 @@ Write-Step 'Установка'
 if ($LASTEXITCODE -ne 0) { throw "code --install-extension вернул код $LASTEXITCODE" }
 Write-Ok "Установлено: $ExtensionId"
 
-if ($SetActive -and (Confirm-Action "Сделать тему '$ThemeName' активной?")) {
-    Set-ActiveTheme -Name $ThemeName
-}
-
 Write-Host ''
 Write-Host 'Дальше: перезагрузите окно (Ctrl+Shift+R). Расширение предложит подключить Mozg' -ForegroundColor Cyan
-Write-Host 'к активной теме. Выбрать тему: Ctrl+K Ctrl+T -> "Mori Gruvbox".' -ForegroundColor Cyan
-
+Write-Host 'к активной теме VS Code.' -ForegroundColor Cyan

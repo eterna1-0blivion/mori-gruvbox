@@ -24,9 +24,6 @@ jobs:
       - name: Install dev dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Verify theme is up to date
-        run: node scripts/build-theme.mjs --check
-
       - name: Test (Chrome is preinstalled on the runner)
         run: npm test
         env:
@@ -38,7 +35,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mori-gruvbox-vsix
+          name: mozg-theme-extension-vsix
           path: mori-gruvbox-${{ github.ref_name }}.vsix
           if-no-files-found: error
 

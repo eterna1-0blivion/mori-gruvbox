@@ -26,11 +26,12 @@ const FIXTURE = fs.readFileSync(path.join(__dirname, 'fixtures', 'mozg-min.css')
 
 const readJson = (...parts) => JSON.parse(fs.readFileSync(path.join(...parts), 'utf8').replace(/^\uFEFF/, ''));
 
+// Color subsets of real themes (only the variables the bridge reads or shadows;
+// see test/fixtures/themes/ for sources and licenses).
 const THEMES = {
-	'Mori Gruvbox': readJson(ROOT, 'themes', 'mori-gruvbox.json').colors,
-	'Gruvbox Dark Hard': readJson(ROOT, 'upstream', 'gruvbox-dark-hard.json').colors,
-	'Dark Modern': readJson(ROOT, 'upstream', 'dark-modern.json').colors,
-	'Light (fixture)': readJson(__dirname, 'fixtures', 'light-theme.json').colors,
+	'Dark Modern': readJson(__dirname, 'fixtures', 'themes', 'dark-modern.json').colors,
+	'Gruvbox Dark Hard': readJson(__dirname, 'fixtures', 'themes', 'gruvbox-dark-hard.json').colors,
+	'Light Modern': readJson(__dirname, 'fixtures', 'themes', 'light-modern.json').colors,
 };
 
 function findChrome() {
@@ -197,6 +198,58 @@ async function assertFollowsTheme(page, name, colors, label) {
 	return s;
 }
 
+// --- Brand mark ---------------------------------------------------------------
+// Mozg draws its mark in three places (home heading with role/title, welcome
+// screen, provider/account blocks with aria-hidden). All share one viewBox,
+// which is what the bridge keys on. Paths are Mozg's own (assets/icons/mori-code.svg).
+const MARK = readJson(__dirname, 'fixtures', 'mozg-mark.json');
+
+const markSvg = (id, attrs) => `
+<svg id="${id}" ${attrs} viewBox="-48 -48 773 773" width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+	${attrs.includes('role') ? '<title>Mozg</title>' : ''}
+	<path d="${MARK.square}" fill="var(--mori-accent, #ff6a1a)"/>
+	<path d="${MARK.letter}" fill="#ffffff" transform="translate(-301.63 159.48) scale(26.113)"/>
+</svg>`;
+
+const MARK_PAGE = `<body>
+${markSvg('mark-home', 'role="img"')}
+${markSvg('mark-welcome', 'aria-hidden="true"')}
+${markSvg('mark-account', 'aria-hidden="true"')}
+<svg id="other-icon" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0z" fill="var(--mori-accent, #ff6a1a)"/></svg>
+<div id="btn" class="mori-button-primary">btn</div>
+</body>`;
+
+const WHITE = 'rgb(255, 255, 255)';
+const INK = 'rgb(28, 28, 36)';
+
+async function markFills(css, bodyClass, vars) {
+	const page = await browser.newPage();
+	try {
+		await page.setContent(
+			`<!doctype html><html><head><style>${css}</style><style>${NO_MOTION}</style></head>` +
+				MARK_PAGE.replace('<body>', `<body class="${bodyClass}">`) +
+				'</html>'
+		);
+		await page.evaluate((v) => {
+			for (const [key, value] of Object.entries(v)) {
+				document.documentElement.style.setProperty(key, value);
+			}
+		}, vars);
+		return await page.evaluate(() => {
+			const fill = (sel) => getComputedStyle(document.querySelector(sel)).fill;
+			return {
+				home: [fill('#mark-home path:nth-of-type(1)'), fill('#mark-home path:nth-of-type(2)')],
+				welcome: [fill('#mark-welcome path:nth-of-type(1)'), fill('#mark-welcome path:nth-of-type(2)')],
+				account: [fill('#mark-account path:nth-of-type(1)'), fill('#mark-account path:nth-of-type(2)')],
+				other: fill('#other-icon path'),
+				button: getComputedStyle(document.querySelector('#btn')).backgroundColor,
+			};
+		});
+	} finally {
+		await page.close();
+	}
+}
+
 // --- Tests ------------------------------------------------------------------
 for (const sheet of stylesheets()) {
 	const css = bridged(sheet.css);
@@ -241,6 +294,34 @@ for (const sheet of stylesheets()) {
 		} finally {
 			await page.close();
 		}
+	});
+
+	test(`[${sheet.name}] brand mark is flat white on dark themes, in all three places`, { skip }, async () => {
+		for (const name of ['Dark Modern', 'Gruvbox Dark Hard']) {
+			const colors = THEMES[name];
+			const fills = await markFills(css, 'vscode-dark', {
+				'--vscode-button-background': colors['button.background'],
+				'--vscode-sideBar-background': colors['sideBar.background'],
+			});
+			for (const place of ['home', 'welcome', 'account']) {
+				assert.deepEqual(fills[place], [WHITE, WHITE], `${name} / ${place}: square and glyph are both white`);
+			}
+		}
+	});
+
+	test(`[${sheet.name}] brand mark turns dark on light themes so it stays visible`, { skip }, async () => {
+		for (const bodyClass of ['vscode-light', 'vscode-high-contrast-light']) {
+			const fills = await markFills(css, bodyClass, { '--vscode-button-background': '#005fb8' });
+			for (const place of ['home', 'welcome', 'account']) {
+				assert.deepEqual(fills[place], [INK, INK], `${bodyClass} / ${place}`);
+			}
+		}
+	});
+
+	test(`[${sheet.name}] the mark rule does not leak onto other accent-colored elements`, { skip }, async () => {
+		const fills = await markFills(css, 'vscode-dark', { '--vscode-button-background': '#076678' });
+		assert.equal(fills.other, 'rgb(7, 102, 120)', 'a different svg keeps following the theme accent');
+		assert.equal(fills.button, 'rgb(7, 102, 120)', 'buttons keep following the theme accent');
 	});
 
 	test(`[${sheet.name}] control: without the bridge Mozg ignores the theme`, { skip }, async () => {

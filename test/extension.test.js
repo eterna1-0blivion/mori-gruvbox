@@ -18,7 +18,7 @@ const bridge = require('../lib/bridge');
 const ROOT = path.join(__dirname, '..');
 const FIXTURE = fs.readFileSync(path.join(__dirname, 'fixtures', 'mozg-min.css'), 'utf8');
 
-function createWorld({ css = FIXTURE, mode = 'ask', answers = [], colorTheme = 'Mori Gruvbox Dark Hard', mozg = true } = {}) {
+function createWorld({ css = FIXTURE, mode = 'ask', answers = [], mozg = true } = {}) {
 	const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mori-ext-'));
 	const mozgDir = path.join(root, 'mori-ai.mori-code-0.0.1');
 	const cssPath = bridge.cssPathFor(mozgDir);
@@ -27,7 +27,7 @@ function createWorld({ css = FIXTURE, mode = 'ask', answers = [], colorTheme = '
 
 	const world = {
 		cssPath,
-		settings: { 'moriGruvbox.mozgBridge': mode, 'workbench.colorTheme': colorTheme },
+		settings: { 'moriGruvbox.mozgBridge': mode },
 		memento: new Map(),
 		infos: [],
 		warnings: [],
@@ -170,14 +170,3 @@ test('without Mozg installed the extension does nothing', async () => {
 	await load(world).ensureBridge(world.context);
 	assert.equal(world.prompts.length + world.warnings.length, 0);
 });
-
-test('the 1.x theme name is migrated, other themes are not touched', async () => {
-	const legacy = createWorld({ colorTheme: 'Mori Gruvbox Dark Hard' });
-	await load(legacy).migrateThemeName();
-	assert.equal(legacy.settings['workbench.colorTheme'], 'Mori Gruvbox');
-
-	const other = createWorld({ colorTheme: 'Dark Modern' });
-	await load(other).migrateThemeName();
-	assert.equal(other.settings['workbench.colorTheme'], 'Dark Modern');
-});
-

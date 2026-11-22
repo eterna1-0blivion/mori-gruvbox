@@ -1,30 +1,26 @@
 {
   "name": "mori-gruvbox",
-  "displayName": "Mori Gruvbox",
-  "description": "Makes the Mozg (mori-code) extension follow your VS Code theme, and adds the Mori Gruvbox theme: Gruvbox Dark Hard accents on the VS Code Dark Modern look.",
-  "version": "2.0.0",
+  "displayName": "Mozg (VS) Code - Theme Extension",
+  "description": "Makes the Mozg (mori-code) chat follow your VS Code color theme - like the built-in Copilot chat. Works with any theme and switches with it.",
+  "version": "3.0.0",
   "publisher": "eterna1-0blivion",
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"
   },
   "categories": [
-    "Themes"
+    "Other"
   ],
   "keywords": [
-    "gruvbox",
-    "dark modern",
-    "theme",
     "mozg",
-    "mori",
     "mori-code",
-    "copilot"
+    "theme",
+    "color theme",
+    "follow theme",
+    "copilot",
+    "webview"
   ],
   "icon": "assets/icon.png",
-  "galleryBanner": {
-    "color": "#181818",
-    "theme": "dark"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/eterna1-0blivion/mori-gruvbox.git"
@@ -43,32 +39,25 @@
     }
   },
   "contributes": {
-    "themes": [
-      {
-        "label": "Mori Gruvbox",
-        "uiTheme": "vs-dark",
-        "path": "./themes/mori-gruvbox.json"
-      }
-    ],
     "commands": [
       {
         "command": "moriGruvbox.applyMozgBridge",
         "title": "Apply Mozg Bridge (follow the VS Code theme)",
-        "category": "Mori Gruvbox"
+        "category": "Mozg Theme"
       },
       {
         "command": "moriGruvbox.revertMozgBridge",
         "title": "Revert Mozg Bridge",
-        "category": "Mori Gruvbox"
+        "category": "Mozg Theme"
       },
       {
         "command": "moriGruvbox.showMozgBridgeStatus",
         "title": "Show Mozg Bridge Status",
-        "category": "Mori Gruvbox"
+        "category": "Mozg Theme"
       }
     ],
     "configuration": {
-      "title": "Mori Gruvbox",
+      "title": "Mozg (VS) Code - Theme Extension",
       "properties": {
         "moriGruvbox.mozgBridge": {
           "type": "string",
@@ -83,20 +72,23 @@
             "Never touch the Mozg stylesheet."
           ],
           "default": "ask",
-          "markdownDescription": "Whether Mori Gruvbox may edit the stylesheet of the Mozg extension (`mori-ai.mori-code`) so that Mozg uses the colors of the active VS Code theme. Mozg updates overwrite the edit; with `auto` it is re-applied on the next start."
+          "markdownDescription": "Whether this extension may edit the stylesheet of the Mozg extension (`mori-ai.mori-code`) so that Mozg uses the colors of the active VS Code theme. Mozg updates overwrite the edit; with `auto` it is re-applied on the next start."
         }
       }
     }
   },
   "scripts": {
-    "build": "node scripts/build-theme.mjs",
-    "check": "node scripts/build-theme.mjs --check",
     "test": "node --test \"test/**/*.test.js\"",
-    "package": "npm run build && vsce package --no-dependencies",
+    "icon": "node scripts/make-icon.mjs",
+    "package": "vsce package --no-dependencies",
     "install:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1"
   },
   "devDependencies": {
     "@vscode/vsce": "^4.1.1",
     "puppeteer-core": "^25.18.1"
+  },
+  "galleryBanner": {
+    "color": "#181818",
+    "theme": "dark"
   }
 }
