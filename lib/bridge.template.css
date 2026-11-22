@@ -1,0 +1,64 @@
+/* ===== MORI BRIDGE BEGIN (generated; do not edit inside the markers) ===== */
+/*
+ * Mori Bridge: Mozg uses the colors of the active VS Code theme.
+ *
+ * VS Code injects every theme color as --vscode-* on <html> and refreshes them
+ * when the theme changes. Mozg shadows ~36 of them on <body> with its own
+ * palette; the first rule below hands them back to the theme. The second rule
+ * maps Mozg's own --mori-* palette onto the same theme variables.
+ *
+ * No theme-specific value appears here, so any theme works and a theme switch
+ * is picked up live. The inherit list is generated from the installed
+ * stylesheet when the bridge is applied.
+ */
+body {
+	/*{{VSCODE_INHERIT}}*/
+}
+
+:root {
+	--mori-accent: var(--vscode-button-background);
+	--mori-accent-hover: var(--vscode-button-hoverBackground, var(--vscode-button-background));
+	--mori-accent-ink: var(--vscode-button-foreground);
+	--mori-bg: var(--vscode-sideBar-background, var(--vscode-editor-background));
+	--mori-surface: var(--vscode-editor-background);
+	--mori-surface-2: var(--vscode-input-background, var(--vscode-editor-background));
+	--mori-hover: var(--vscode-list-hoverBackground, var(--vscode-toolbar-hoverBackground));
+	--mori-border: var(--vscode-panel-border, var(--vscode-widget-border, currentColor));
+	--mori-text: var(--vscode-foreground);
+	--mori-text-muted: var(--vscode-descriptionForeground, var(--vscode-foreground));
+	--color-cline: var(--mori-accent);
+}
+
+/* Decorative gradients -> flat fills, as in the native VS Code UI.
+   Masks (mask-image) are functional scroll fades and are deliberately kept. */
+.bg-gradient-to-b,
+.bg-gradient-to-t,
+.bg-linear-to-r,
+.bg-linear-90 {
+	background-image: none;
+}
+
+.mori-welcome {
+	background: var(--mori-bg);
+}
+
+/* "Thinking..." shimmer text: a gradient clipped to the glyphs. Dropping the
+   gradient alone would leave the (transparent) text invisible, so the clip
+   and the color are restored together. */
+.animate-shimmer.bg-clip-text {
+	background-image: none;
+	-webkit-background-clip: border-box;
+	background-clip: border-box;
+	color: var(--vscode-foreground);
+}
+
+/* Inline style="background: linear-gradient(...)". Matches on substrings that
+   survive any serialization; elements that also carry a mask are skipped. */
+[style*="linear-gradient"][style*="96%"] {
+	background: var(--vscode-editorWidget-background, var(--vscode-sideBar-background)) !important;
+}
+
+[style*="linear-gradient"]:not([style*="mask"]):not([style*="96%"]) {
+	background-image: none !important;
+}
+/* ===== MORI BRIDGE END ===== */

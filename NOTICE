@@ -1,42 +1,51 @@
 Mori Gruvbox
 ============
 
-This project is a derivative work. It reuses and modifies the color theme
-"Gruvbox" for Visual Studio Code.
+This project is a derivative work. It reuses colors and syntax rules from
+the themes listed below. Their licenses and copyright notices are retained.
 
 1. Gruvbox for Visual Studio Code
 ---------------------------------
 upstream/gruvbox-dark-hard.json
-themes/mori-gruvbox-dark-hard.json (derived)
+themes/mori-gruvbox.json (derived)
 
-    Copyright © 2017 JD
+    Copyright (c) 2017 JD
     Source:  https://github.com/jdinhify/vscode-theme-gruvbox
     License: MIT (full text in upstream/LICENSE.txt)
 
-    All tokenColors, semanticTokenColors and the majority of theme colors are
-    taken from the upstream theme without modification. Only UI colors
-    (the "colors" object) are partially overridden by this project; the full
-    list of overrides is in src/overrides.json. The upstream MIT license and
-    copyright notice are retained as required.
+    tokenColors and semanticTokenColors are taken unmodified. A subset of the
+    UI colors is reused as well (see scripts/build-theme.mjs).
 
-2. "Gruvbox" color palette
---------------------------
+2. Gruvbox color palette
+------------------------
 The Gruvbox color palette was created by Pavel Pertsev (morhetz).
 
-    Source: https://github.com/morhetz/gruvbox
+    Source:  https://github.com/morhetz/gruvbox
     License: MIT
 
-3. Mozg / mori-code integration
--------------------------------
-mozg/mori-neutral.css contains CSS custom property overrides that restyle the
-webview of the "Mozg" extension (publisher mori-ai, id mori-code). It is not
-an official part of that extension and is not affiliated with or endorsed by
-Mozg AI. The extension itself is not redistributed here: the script patches a
-file in your local installation only, and can revert it.
+3. Visual Studio Code "Dark Modern" theme
+----------------------------------------
+upstream/dark-modern.json
+themes/mori-gruvbox.json (derived)
 
-4. This project
+    Copyright (c) 2015 - present Microsoft Corporation
+    Source:  https://github.com/microsoft/vscode
+    License: MIT (full text in upstream/LICENSE-vscode.txt)
+
+    The UI colors of the Mori Gruvbox theme are taken from the built-in
+    "Dark Modern" theme (colors only, flattened by scripts/vendor-dark-modern.mjs).
+
+4. Mozg / mori-code integration
+-------------------------------
+lib/bridge.template.css restyles the webview of the "Mozg" extension
+(publisher mori-ai, id mori-code) at the user request, by editing one
+stylesheet in the local installation. Mozg itself is not redistributed here.
+This project is not affiliated with or endorsed by Mozg AI; it can undo its
+change at any time ("Mori Gruvbox: Revert Mozg Bridge").
+
+5. This project
 ---------------
-Everything else (build scripts, installer scripts, icon, documentation):
+Everything else (extension code, bridge, tests, scripts, icon, documentation):
 
     Copyright (c) 2026 eterna1-0blivion
     License: MIT (full text in LICENSE)

@@ -1,0 +1,11 @@
+@layer theme{:root{--color-cline:#ff6a1a;--color-background:var(--vscode-sideBar-background);--color-button-background:var(--vscode-button-background);--color-link:var(--vscode-textLink-foreground)}}
+.bg-cline{background-color:var(--color-cline)}
+.bg-gradient-to-b{background-image:linear-gradient(to bottom,red,blue)}
+.bg-linear-to-r{background-image:linear-gradient(to right,red,blue)}
+.bg-sidebar{background-color:var(--color-background)}
+.text-link{color:var(--color-link)}
+.mori-welcome{background:radial-gradient(120% 60% at 50% 0%,var(--mori-accent),transparent 70%),var(--mori-bg)}
+.animate-shimmer{background-image:linear-gradient(90deg,#fff,#888);-webkit-background-clip:text;background-clip:text}
+.bg-clip-text{-webkit-background-clip:text;background-clip:text}
+.text-transparent{color:#0000}
+:root{--mori-accent:#ff6a1a;--mori-accent-hover:#ff8240;--mori-accent-ink:#fff;--mori-bg:#0d0d0d;--mori-surface:#171717;--mori-surface-2:#212121;--mori-hover:#393939;--mori-border:#2f2f2f;--mori-text:#ececec;--mori-text-muted:#a3a3a3;--mori-font:"Manrope", system-ui, sans-serif}body{--vscode-font-family:var(--mori-font);--vscode-foreground:var(--mori-text);--vscode-descriptionForeground:var(--mori-text-muted);--vscode-sideBar-background:var(--mori-bg);--vscode-editor-background:var(--mori-surface);--vscode-editor-foreground:var(--mori-text);--vscode-panel-border:var(--mori-border);--vscode-focusBorder:var(--mori-accent);--vscode-button-background:var(--mori-accent);--vscode-button-foreground:var(--mori-accent-ink);--vscode-button-hoverBackground:var(--mori-accent-hover);--vscode-input-background:var(--mori-surface-2);--vscode-list-hoverBackground:var(--mori-hover);--vscode-list-activeSelectionBackground:var(--mori-accent)}@supports (color:color-mix(in lab,red,red)){body{--vscode-list-activeSelectionBackground:color-mix(in srgb, var(--mori-accent) 25%, var(--mori-surface-2))}}body{--vscode-textLink-foreground:var(--mori-accent);--vscode-badge-background:var(--mori-accent);--vscode-badge-foreground:var(--mori-accent-ink);--vscode-progressBar-background:var(--mori-accent);font-family:var(--mori-font);background-color:var(--mori-bg);color:var(--mori-text)}.mori-button-primary{background:var(--mori-accent);color:var(--mori-accent-ink)}.mori-badge{background:var(--mori-accent);color:var(--mori-accent-ink)}

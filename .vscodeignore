@@ -4,8 +4,8 @@
 node_modules/**
 scripts/**
 src/**
+test/**
 upstream/**
-mozg/**
 *.vsix
 *.md
 !README.md
@@ -13,6 +13,5 @@ mozg/**
 !LICENSE
 !NOTICE
 package-lock.json
-assets/icon.svg
 .gitignore
 .gitattributes

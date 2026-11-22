@@ -1,155 +1,143 @@
 # Mori Gruvbox
 
-Gruvbox с нейтральным интерфейсом: подсветка кода остаётся Gruvbox, а панели,
-вкладки, кнопки, бейджи и чат становятся серыми — без цветных акцентов, в духе
-встроенной темы Dark Modern.
+Расширение делает две вещи:
 
-Состоит из двух независимых частей:
+1. **Переносит цвета активной темы VS Code в расширение Mozg** (`mori-ai.mori-code`).
+   Mozg рисует чат в webview со своей палитрой (оранжевый акцент `#ff6a1a`,
+   фон `#0d0d0d`) и не следует теме редактора. После подключения «моста» он
+   берёт цвета выбранной вами темы — как встроенный чат Copilot. Работает с
+   любой темой, переключение подхватывается сразу.
+2. **Добавляет одну авторскую тему — `Mori Gruvbox`**: оформление интерфейса
+   как у VS Code Dark Modern, акценты и подсветка кода — Gruvbox Dark Hard.
 
-| Часть | Что делает | Откат |
-|---|---|---|
-| **Тема VS Code** | расширение-тема `Mori Gruvbox Dark Hard` | `install-vscode-theme.ps1 -Uninstall` |
-| **Тема Mozg** | патч интерфейса расширения [Mozg](https://github.com/MORI-AI-PLATFORM/mori-code-releases) (`mori-ai.mori-code`) | `install-mozg-theme.ps1 -Revert` |
-
-## Зачем две части
-
-Расширение Mozg рисует интерфейс в webview и **не наследует тему VS Code** —
-его CSS задаёт собственную палитру (`--mori-accent: #ff6a1a` и другие). Поэтому
-темы VS Code недостаточно: чтобы убрать оранжевый акцент из чата, нужен
-отдельный патч его CSS. Обратное тоже верно: патч Mozg никак не влияет на
-остальной редактор.
+Остальные темы мы не меняем: Mozg просто получает их цвета как есть.
 
 ## Установка
+
+Из `.vsix` (страница Releases) или из исходников:
 
 ```powershell
 git clone https://github.com/eterna1-0blivion/mori-gruvbox.git
 cd mori-gruvbox
-.\scripts\install.ps1
+npm install
+.\scripts\install.ps1            # собрать и установить
+.\scripts\install.ps1 -SetActive # и сразу сделать тему активной
 ```
 
-Скрипт задаёт **два отдельных вопроса** — про тему VS Code и про тему Mozg.
-Можно согласиться на любую часть или отказаться от обеих.
+Перезагрузите окно (`Ctrl+Shift+R`). Если установлен Mozg, расширение спросит,
+можно ли подключить его к теме. Выбрать тему: `Ctrl+K Ctrl+T` → **Mori Gruvbox**.
 
-Только одна часть:
+## Как работает мост
+
+VS Code передаёт каждому webview все цвета темы как CSS-переменные
+`--vscode-*` и обновляет их при смене темы. Mozg перекрывает 36 из них своими
+(`--vscode-sideBar-background: var(--mori-bg)` и т. д.). Мост добавляет в конец
+таблицы стилей Mozg один блок, который
+
+- возвращает эти 36 переменных теме (`inherit`);
+- привязывает палитру самого Mozg (`--mori-accent`, `--mori-bg`, …) к
+  переменным темы;
+- заменяет декоративные градиенты плоскими заливками (как в интерфейсе VS Code).
+  Маски прокрутки (`mask-image`) не трогаются.
+
+В блоке **нет ни одного значения цвета**, поэтому он одинаково работает с
+любой темой, включая светлые и высококонтрастные, и не требует повторного
+применения при смене темы. Список из 36 переменных не зашит в код: он
+вычисляется из установленной таблицы стилей Mozg.
+
+## Что делает расширение с файлами Mozg
+
+Мост — это правка одного файла другого расширения
+(`webview-ui/build/assets/index.css`). Поэтому:
+
+| Параметр `moriGruvbox.mozgBridge` | Поведение |
+|---|---|
+| `ask` (по умолчанию) | спрашивает: Apply / Always apply / Not now / Never |
+| `auto` | применяет сам, в том числе после обновления Mozg |
+| `off` | ничего не трогает |
+
+- Оригинал сохраняется рядом как `index.css.orig`.
+- Если структура файла не узнана (нет `--mori-accent`), файл **не меняется**,
+  а вы получаете одно предупреждение на версию Mozg.
+- Обновление Mozg затирает правку; при `auto` мост вернётся на следующем
+  запуске, при `ask` расширение спросит снова.
+- VS Code не сверяет контрольные суммы файлов расширений, поэтому правка не
+  ломает загрузку.
+
+Команды (`Ctrl+Shift+P`): **Mori Gruvbox: Apply Mozg Bridge**,
+**Revert Mozg Bridge**, **Show Mozg Bridge Status**.
+
+Без запущенного VS Code (скрипты, отладка):
 
 ```powershell
-.\scripts\install.ps1 -Only vscode     # только тема редактора
-.\scripts\install.ps1 -Only mozg       # только интерфейс Mozg
+node scripts/bridge-cli.js status
+node scripts/bridge-cli.js apply
+node scripts/bridge-cli.js revert
 ```
 
-После установки перезагрузите окно (`Ctrl+Shift+R`) и выберите тему:
-`Ctrl+K Ctrl+T` → **Mori Gruvbox Dark Hard**.
+## Тема Mori Gruvbox
 
-Сделать тему активной сразу:
+| Что | Откуда |
+|---|---|
+| Интерфейс: панели, вкладки, поля, меню | VS Code **Dark Modern** (152 цвета) |
+| Акценты: фокус, кнопки, бейджи, ссылки, выделение, git-метки | **Gruvbox Dark Hard** (41 цвет, `src/accents.json`) |
+| Подсветка кода: 130 правил токенов + семантика | **Gruvbox Dark Hard** без изменений |
+| Прочие цвета, которых нет в Dark Modern | Gruvbox, кроме сплошных фонов и рамок |
+
+Сплошные фоны Gruvbox (`#1d2021`) намеренно не переносятся: они выбивались бы
+из серого оформления Dark Modern. Цвет текста на акцентах проверен на контраст
+не ниже 4.5:1 (WCAG AA); для кнопок взят более глубокий `#076678` вместо
+`#458588`, у которого контраст с текстом только 3.7:1.
+
+Версия 1.x (тема «Mori Gruvbox Dark Hard» плюс патч с фиксированной серой
+палитрой) не следовала теме редактора и давала гибрид, непохожий ни на
+Gruvbox, ни на Dark Modern. Название темы в `settings.json` мигрирует само.
+
+## Разработка
 
 ```powershell
-.\scripts\install.ps1 -Yes -SetActive
+npm install
+npm run build     # themes/mori-gruvbox.json из upstream + src/accents.json
+npm run check     # тема актуальна? (для CI)
+npm test          # 36 тестов, включая проверку в настоящем Chrome
+npm run package   # .vsix
 ```
 
-## Требования
-
-- **Windows** — скрипты написаны на PowerShell (5.1 и 7+).
-- **Node.js 18+** — только для сборки JSON темы и упаковки `.vsix`.
-- **VS Code 1.80+** — тема; Mozg ставится отдельно.
-
-### Если PowerShell блокирует запуск
-
-При политике `RemoteSigned` скрипты, скачанные как ZIP с GitHub, будут
-заблокированы (метка «из интернета»). Варианты:
-
-```powershell
-# разово, без изменения системных настроек
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1
-
-# либо снять блокировку с файлов проекта
-Get-ChildItem -Recurse | Unblock-File
-```
-
-## После установки
-
-Тема VS Code и патч Mozg независимы, но вместе дают цельный вид.
-
-### Удаление старого блока настроек
-
-Если раньше вы применяли цвета через `settings.json`, там остался блок:
-
-```jsonc
-"[Gruvbox Dark Hard]": {
-    "workbench.colorCustomizations": { /* 84 цвета */ }
-}
-```
-
-Те же цвета теперь **внутри темы**, поэтому блок дублирует их и действует
-только на старую Gruvbox. `install.ps1` предложит удалить его отдельным
-вопросом сразу после установки темы (с бэкапом `settings.json.bak-mori-gruvbox`).
-
-## Что именно меняется
-
-Подсветка синтаксиса (`tokenColors`, `semanticTokenColors`) берётся из Gruvbox
-Dark Hard без изменений. Переопределяются только цвета UI — 84 ключа:
-поверхности, границы, бейджи, кнопки, прогресс, ссылки, выделение, а также
-ключи `chat.*` (пузыри сообщений, аватар, блок запроса, рамка ввода).
-
-| Где | Gruvbox | Mori Gruvbox |
-|---|---|---|
-| `sideBar.background` | `#1d2021` | `#181818` |
-| `editor.background` | `#1d2021` | `#1f1f1f` |
-| `badge.background` | `#b16286` (розовый) | `#3c3c3c` |
-| `button.background` | `#458588` (синий) | `#3a3a3a` |
-| `progressBar.background` | `#689d6a` (зелёный) | `#5a5a5a` |
-| `textLink.foreground` | `#83a598` (аква) | `#9db8c4` |
-| `chat.slashCommandBackground` | — | `#ffffff14` |
-| `chat.requestBubbleBackground` | — | `#ffffff0d` |
-
-Полный список — в `src/overrides.json`. Изменить палитру можно там же, затем
-`npm run build`.
-
-## Сборка
-
-```powershell
-npm run build     # upstream + overrides -> themes/mori-gruvbox-dark-hard.json
-npm run check     # проверить, что тема в репозитории актуальна (для CI)
-npm run package   # собрать .vsix
-```
-
-## Структура
+- `test/bridge.test.js` — применение, идемпотентность, откат, обновление Mozg,
+  повреждённые и незнакомые файлы, CRLF;
+- `test/extension.test.js` — поведение расширения во всех режимах;
+- `test/browser.test.js` — в настоящем Chrome подставляет цвета разных тем
+  (Mori Gruvbox, Gruvbox, Dark Modern, светлая) в таблицу стилей Mozg и
+  сравнивает вычисленные цвета; переключает темы на живой странице; есть
+  контрольный прогон без моста, показывающий, что тест способен упасть.
+  Без Chrome и `puppeteer-core` пропускается (`CHROME_PATH` задаёт путь).
 
 ```
-upstream/   оригинальная тема Gruvbox Dark Hard (MIT, © 2017 JD)
-src/        overrides.json — наш слой цветов
-themes/     собранная тема (генерируется, но коммитится)
-mozg/       mori-neutral.css — блок переопределений для webview Mozg
-scripts/    build-theme.mjs, make-icon.ps1, install*.ps1
-assets/     icon.png
+extension.js              точка входа расширения
+lib/bridge.js             логика моста (чистый Node)
+lib/bridge.template.css   блок, который дописывается в стили Mozg
+src/accents.json          акценты темы
+upstream/                 Gruvbox Dark Hard, Dark Modern (MIT)
+themes/                   собранная тема (коммитится)
+scripts/                  build-theme, install.ps1, bridge-cli, vendor-dark-modern
+test/                     тесты и фикстуры
 ```
 
-## Откат
+## Ограничения
 
-```powershell
-.\scripts\install-mozg-theme.ps1 -Revert        # вернуть CSS Mozg
-.\scripts\install-vscode-theme.ps1 -Uninstall   # удалить тему
-```
-
-Проверить состояние патча Mozg (полезно после обновления расширения):
-
-```powershell
-.\scripts\install-mozg-theme.ps1 -Status
-```
-
-## Ограничения и оговорки
-
-- **Патч Mozg живёт до обновления расширения.** Апдейт переустанавливает
-  `index.css` и затирает блок. После обновления запустите скрипт снова.
-- Патч — это правка собранного CSS, а не исходников. Если авторы Mozg
-  переименуют переменные, скрипт обнаружит это по отсутствию `--mori-accent`
-  и откажется патчить, чтобы не испортить файл.
-- **Неофициальный проект.** Не связан с Mozg AI / mori-ai и не одобрен ими.
-  «Gruvbox» — палитра Pavel Pertsev (morhetz). Атрибуция — в [NOTICE](NOTICE).
-- Проект проверялся на VS Code 1.147.0 (Windows). На других версиях ключи
-  `chat.*` могут различаться: неизвестные ключи VS Code игнорирует, но и
-  эффекта не дадут.
+- **Мост — правка чужого расширения.** Если Mozg изменит структуру стилей,
+  мост откажется работать, пока его не обновят.
+- Проверено на VS Code 1.147.0 и Mozg 0.2.15. Цвета берутся из переменных,
+  которые VS Code передаёт любому webview, а не из внутренних API.
+- **Неофициальный проект**, не связан с Mozg AI / mori-ai.
+- `install.ps1` рассчитан на Windows; расширение и сборка кроссплатформенны.
+- Мост проверен автоматически (вычисленные цвета в Chrome) и на реальном
+  VS Code (запущенное расширение применило его к свежему Mozg). Как выглядит
+  чат на глаз, зависит от версии Mozg — это стоит посмотреть самому.
 
 ## Лицензия
 
-MIT. Тема Gruvbox — MIT, © 2017 JD; палитра Gruvbox — MIT, © Pavel Pertsev.
-Подробности в [LICENSE](LICENSE) и [NOTICE](NOTICE).
+MIT. Gruvbox Dark Hard — MIT, © 2017 JD; палитра Gruvbox — © Pavel Pertsev;
+Dark Modern — часть VS Code, MIT, © Microsoft. Подробности — в
+[LICENSE](LICENSE) и [NOTICE](NOTICE).
+

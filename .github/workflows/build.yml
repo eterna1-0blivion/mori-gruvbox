@@ -21,21 +21,29 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dev dependencies
+        run: npm install --no-audit --no-fund
+
       - name: Verify theme is up to date
         run: node scripts/build-theme.mjs --check
 
+      - name: Test (Chrome is preinstalled on the runner)
+        run: npm test
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+
       - name: Package .vsix
-        run: npx --yes @vscode/vsce package --no-dependencies --out mori-gruvbox.vsix
+        run: npx --yes @vscode/vsce package --no-dependencies --out mori-gruvbox-${{ github.ref_name }}.vsix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: mori-gruvbox-vsix
-          path: mori-gruvbox.vsix
+          path: mori-gruvbox-${{ github.ref_name }}.vsix
           if-no-files-found: error
 
       - name: Attach .vsix to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: mori-gruvbox.vsix
+          files: mori-gruvbox-${{ github.ref_name }}.vsix

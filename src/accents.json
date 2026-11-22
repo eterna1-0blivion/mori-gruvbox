@@ -1,0 +1,48 @@
+{
+  "focusBorder": "#689d6a",
+  "statusBar.focusBorder": "#689d6a",
+  "statusBarItem.focusBorder": "#689d6a",
+  "agentsChatInput.focusBorder": "#689d6a",
+  "activityBar.activeBorder": "#689d6a",
+  "panelTitle.activeBorder": "#689d6a",
+  "tab.activeBorderTop": "#689d6a",
+  "tab.selectedBorderTop": "#8ec07c",
+  "terminal.tab.activeBorder": "#689d6a",
+  "progressBar.background": "#689d6a",
+  "welcomePage.progress.foreground": "#689d6a",
+
+  "button.background": "#076678",
+  "button.hoverBackground": "#2f7478",
+  "button.foreground": "#fbf1c7",
+  "activityBarBadge.background": "#076678",
+  "activityBarBadge.foreground": "#fbf1c7",
+  "statusBarItem.remoteBackground": "#076678",
+  "statusBarItem.remoteForeground": "#fbf1c7",
+  "statusBar.debuggingBackground": "#af3a03",
+  "statusBar.debuggingForeground": "#fbf1c7",
+  "menu.selectionBackground": "#076678",
+  "menu.selectionForeground": "#fbf1c7",
+
+  "textLink.foreground": "#83a598",
+  "textLink.activeForeground": "#8ec07c",
+  "inputOption.activeBorder": "#689d6a",
+  "inputOption.activeBackground": "#689d6a40",
+  "errorForeground": "#fb4934",
+
+  "editorGutter.modifiedBackground": "#83a598",
+  "editorGutter.addedBackground": "#b8bb26",
+  "editorGutter.deletedBackground": "#fb4934",
+  "editor.selectionBackground": "#689d6a40",
+  "editor.selectionHighlightBackground": "#fabd2f40",
+  "editor.findMatchBackground": "#83a59870",
+  "peekViewEditor.matchHighlightBackground": "#d7992166",
+  "peekViewResult.matchHighlightBackground": "#d7992166",
+  "settings.modifiedItemIndicator": "#d7992166",
+
+  "list.activeSelectionBackground": "#3c383680",
+  "list.activeSelectionForeground": "#8ec07c",
+  "list.highlightForeground": "#689d6a",
+
+  "chat.slashCommandBackground": "#45858840",
+  "chat.slashCommandForeground": "#83a598"
+}

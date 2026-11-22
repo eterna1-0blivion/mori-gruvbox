@@ -1,0 +1,23 @@
+{
+  "_source": "Subset of VS Code built-in 'Light Modern' colors, used to test a light theme.",
+  "colors": {
+    "foreground": "#3b3b3b",
+    "descriptionForeground": "#717171",
+    "editor.background": "#ffffff",
+    "editor.foreground": "#3b3b3b",
+    "sideBar.background": "#f8f8f8",
+    "panel.border": "#e5e5e5",
+    "widget.border": "#e5e5e5",
+    "input.background": "#ffffff",
+    "list.hoverBackground": "#f2f2f2",
+    "list.activeSelectionBackground": "#e8e8e8",
+    "button.background": "#005fb8",
+    "button.hoverBackground": "#0258a8",
+    "button.foreground": "#ffffff",
+    "textLink.foreground": "#005fb8",
+    "badge.background": "#cccccc",
+    "badge.foreground": "#3b3b3b",
+    "progressBar.background": "#005fb8",
+    "focusBorder": "#005fb8"
+  }
+}
