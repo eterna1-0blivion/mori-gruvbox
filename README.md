@@ -52,6 +52,27 @@ cd mori-gruvbox
 - **Node.js 18+** — только для сборки JSON темы и упаковки `.vsix`.
 - **VS Code 1.80+** — тема; Mozg ставится отдельно.
 
+### Если PowerShell блокирует запуск
+
+При политике `RemoteSigned` скрипты, скачанные как ZIP с GitHub, будут
+заблокированы (метка «из интернета»). Варианты:
+
+```powershell
+# разово, без изменения системных настроек
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install.ps1
+
+# либо снять блокировку с файлов проекта
+Get-ChildItem -Recurse | Unblock-File
+```
+
+## После установки
+
+Тема VS Code и патч Mozg независимы, но вместе дают цельный вид.
+
+Если в `settings.json` остался прежний блок `"[Gruvbox Dark Hard]"`
+с `workbench.colorCustomizations`, его можно удалить: те же цвета теперь
+внутри темы, а блок действует только на старую Gruvbox.
+
 ## Что именно меняется
 
 Подсветка синтаксиса (`tokenColors`, `semanticTokenColors`) берётся из Gruvbox
