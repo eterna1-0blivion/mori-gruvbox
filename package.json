@@ -2,8 +2,19 @@
   "name": "mori-gruvbox",
   "displayName": "Mozg (VS) Code - Theme Extension",
   "description": "Makes the Mozg (mori-code) chat follow your VS Code color theme - like the built-in Copilot chat. Works with any theme and switches with it.",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "publisher": "eterna1-0blivion",
+  "author": {
+    "name": "eterna1-0blivion",
+    "url": "https://github.com/eterna1-0blivion"
+  },
+  "contributors": [
+    {
+      "name": "Mozg AI",
+      "url": "https://mozg.world",
+      "comment": "The whole extension - code, tests, scripts, icon, documentation - was written by the Mozg AI assistant, working with eterna1-0blivion as the human reviewer."
+    }
+  ],
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"

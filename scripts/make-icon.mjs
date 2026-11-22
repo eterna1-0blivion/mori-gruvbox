@@ -1,3 +1,6 @@
+// Mozg (VS) Code - Theme Extension - (c) 2026 eterna1-0blivion, MIT.
+// Written by the Mozg AI assistant (https://mozg.world) with eterna1-0blivion.
+
 #!/usr/bin/env node
 /**
  * Генерирует assets/icon.png: скруглённый квадрат Mozg, слева оранжевый,

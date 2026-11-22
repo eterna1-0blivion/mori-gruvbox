@@ -1,16 +1,21 @@
+// Mozg (VS) Code - Theme Extension - (c) 2026 eterna1-0blivion, MIT.
+// Written by the Mozg AI assistant (https://mozg.world) with eterna1-0blivion.
+
 #!/usr/bin/env node
 'use strict';
 
 /**
- * Command-line access to the Mori bridge, for use without VS Code running.
- * The extension does the same on its own; this is for scripts and debugging.
+ * Консольный доступ к мосту Mozg Theme, без запуска самого VS Code.
+ * Расширение делает то же самое автоматически при старте — этот скрипт
+ * нужен для ручной отладки и для сценариев установки (scripts/install.ps1).
  *
- *   node scripts/bridge-cli.js status [--extensions-dir DIR]
- *   node scripts/bridge-cli.js apply  [--extensions-dir DIR]
- *   node scripts/bridge-cli.js revert [--extensions-dir DIR]
+ *   node scripts/bridge-cli.js status [--extensions-dir КАТАЛОГ]
+ *   node scripts/bridge-cli.js apply  [--extensions-dir КАТАЛОГ]
+ *   node scripts/bridge-cli.js revert [--extensions-dir КАТАЛОГ]
  *
- * Default directory: ~/.vscode/extensions. Exit codes: 0 ok, 1 error,
- * 2 nothing could be changed (no Mozg found / unsupported stylesheet).
+ * Каталог по умолчанию: ~/.vscode/extensions.
+ * Код возврата: 0 — всё хорошо, 1 — ошибка использования,
+ * 2 — ничего не удалось изменить (Mozg не найден или файл стилей не узнан).
  */
 
 const fs = require('fs');
@@ -20,6 +25,7 @@ const bridge = require('../lib/bridge');
 
 const TEMPLATE = path.join(__dirname, '..', 'lib', 'bridge.template.css');
 
+/** Разбирает аргументы командной строки: команду и необязательный каталог. */
 function parse(argv) {
 	const [command, ...rest] = argv;
 	let dir = path.join(os.homedir(), '.vscode', 'extensions');
@@ -31,6 +37,7 @@ function parse(argv) {
 	return { command, dir };
 }
 
+// Человеко-читаемые пояснения к состояниям, которые возвращает lib/bridge.js.
 const NOTES = {
 	none: 'bridge not applied',
 	legacy: 'patch from the pre-extension script present (apply replaces it)',
@@ -57,6 +64,9 @@ function main() {
 	let changedAny = false;
 	let failed = false;
 
+	// Обычно установлена одна версия Mozg, но если их несколько (например,
+	// осталась старая после обновления) — обрабатываем каждую по отдельности,
+	// чтобы ошибка на одной не мешала остальным.
 	for (const install of installs) {
 		let result;
 		try {

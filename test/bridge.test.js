@@ -1,3 +1,6 @@
+// Mozg (VS) Code - Theme Extension - (c) 2026 eterna1-0blivion, MIT.
+// Written by the Mozg AI assistant (https://mozg.world) with eterna1-0blivion.
+
 'use strict';
 
 const test = require('node:test');

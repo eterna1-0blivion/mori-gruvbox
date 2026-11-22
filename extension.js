@@ -1,15 +1,23 @@
 'use strict';
 
 /**
- * Mozg (VS) Code - Theme Extension: extension host entry.
+ * Mozg (VS) Code - Theme Extension: точка входа расширения.
  *
- * Applies the Mori bridge - a patch of the Mozg webview stylesheet that makes
- * Mozg use the colors of whatever VS Code theme is active (see lib/bridge.js).
+ * Применяет Mori Bridge — патч файла стилей веб-панели Mozg, который
+ * заставляет Mozg использовать цвета активной темы VS Code
+ * (сама логика — в lib/bridge.js, этот файл только вызывает её в нужные
+ * моменты и общается с пользователем через UI VS Code).
  *
- * Mozg is a separate extension, so we only touch its files with consent:
- * moriGruvbox.mozgBridge = "ask" (default) | "auto" | "off".
- * (The setting and command ids keep their original "moriGruvbox" prefix so
- * that existing user settings continue to work.)
+ * Mozg — чужое расширение, поэтому мы трогаем его файлы только с согласия
+ * пользователя: настройка moriGruvbox.mozgBridge = "ask" (по умолчанию) |
+ * "auto" | "off". Идентификаторы настройки и команд сохранили исторический
+ * префикс "moriGruvbox" (от прежнего названия проекта), чтобы у тех, кто
+ * уже настроил расширение раньше, ничего не сбросилось при обновлении.
+ *
+ * Сообщения пользователю (showInformationMessage/showWarningMessage) и
+ * подписи кнопок оставлены на английском — это стандартная практика для
+ * расширений VS Code, которые публикуются в общий Marketplace. Комментарии
+ * в самом коде — на русском, для тех, кто будет читать и дорабатывать файл.
  */
 
 const fs = require('fs');
@@ -27,6 +35,7 @@ const REASONS = {
 		'Please open an issue so the bridge can be updated.',
 };
 
+/** Находит установленный Mozg и возвращает то, что нужно мосту: версию и путь к CSS. */
 function getMozg() {
 	const mozg = vscode.extensions.getExtension(MOZG_ID);
 	if (!mozg) {
@@ -38,10 +47,12 @@ function getMozg() {
 	};
 }
 
+/** Читает шаблон блока моста (lib/bridge.template.css) рядом с кодом расширения. */
 function readTemplate(context) {
 	return fs.readFileSync(path.join(context.extensionPath, 'lib', 'bridge.template.css'), 'utf8');
 }
 
+/** Показывает сообщение с кнопкой перезагрузки окна и выполняет её при нажатии. */
 async function offerReload(text) {
 	const reload = 'Reload Window';
 	const choice = await vscode.window.showInformationMessage(text, reload);
@@ -50,7 +61,10 @@ async function offerReload(text) {
 	}
 }
 
-/** Applies the bridge and reports the outcome. Returns true when changed. */
+/**
+ * Применяет мост и сообщает результат пользователю.
+ * Возвращает true, если файл стилей Mozg реально изменился.
+ */
 async function applyBridge(context, mozg) {
 	const result = bridge.apply(mozg.cssPath, readTemplate(context));
 	if (result.state === 'unsupported') {
@@ -69,7 +83,14 @@ async function applyBridge(context, mozg) {
 	return result.changed;
 }
 
-/** Startup check: re-applies after a Mozg update, honoring the setting. */
+/**
+ * Проверка при запуске VS Code: решает, нужно ли (пере)применить мост, и как
+ * себя вести в зависимости от настройки moriGruvbox.mozgBridge.
+ *
+ * Эта функция вызывается на каждом старте VS Code (см. activate() ниже),
+ * поэтому она должна быть «тихой», если применять мост не нужно — не
+ * показывать лишних сообщений при каждом открытии редактора.
+ */
 async function ensureBridge(context) {
 	const mozg = getMozg();
 	if (!mozg) {
@@ -87,6 +108,9 @@ async function ensureBridge(context) {
 		return;
 	}
 
+	// Структуру стилей Mozg не узнать (скорее всего — после обновления Mozg
+	// с другой вёрсткой webview). Предупреждаем один раз на эту версию Mozg,
+	// а не при каждом запуске — ключ в globalState запоминает, что уже сказали.
 	const noticeKey = `notified:${status.state}:${mozg.version}`;
 	if (status.state === 'unsupported') {
 		if (!context.globalState.get(noticeKey)) {
@@ -101,7 +125,9 @@ async function ensureBridge(context) {
 		return;
 	}
 
-	// mode === 'ask': do not nag again for the same Mozg version after a "Not now".
+	// mode === 'ask': если пользователь уже один раз ответил "Not now" для
+	// этой версии Mozg, больше не спрашиваем — до следующего обновления Mozg
+	// (новая версия Mozg даёт новый declinedKey, и вопрос зададут снова).
 	const declinedKey = `declined:${mozg.version}`;
 	if (context.globalState.get(declinedKey)) {
 		return;
@@ -133,6 +159,7 @@ async function ensureBridge(context) {
 	}
 }
 
+/** Общий страж для команд: без установленного Mozg им просто нечего делать. */
 function withMozg(action) {
 	const mozg = getMozg();
 	if (!mozg) {
@@ -168,7 +195,9 @@ function activate(context) {
 		)
 	);
 
-	// Mozg may activate after us; give it a moment, but never block startup.
+	// Mozg может активироваться позже нас (мы не знаем порядок активации
+	// расширений в VS Code), поэтому проверяем мост с небольшой задержкой —
+	// но так, чтобы это не блокировало запуск самого VS Code.
 	const timer = setTimeout(() => {
 		ensureBridge(context).catch((error) => console.error('[mozg-theme]', error));
 	}, 1500);
@@ -177,5 +206,6 @@ function activate(context) {
 
 function deactivate() {}
 
-// `_internal` is exposed for tests only.
+// `_internal` используется только тестами (test/extension.test.js), чтобы
+// вызывать внутренние функции напрямую через заглушку пакета `vscode`.
 module.exports = { activate, deactivate, _internal: { ensureBridge, applyBridge } };

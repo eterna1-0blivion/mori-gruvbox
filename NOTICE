@@ -35,3 +35,8 @@ documentation):
 
   Copyright (c) 2026 eterna1-0blivion
   License: MIT (full text in LICENSE)
+
+  Authorship: the entire code base, its tests, the build and install scripts,
+  the icon generator and this documentation were written by the Mozg AI
+  assistant (https://mozg.world), working under the direction and review of
+  eterna1-0blivion, who defined the requirements and accepted the results.
