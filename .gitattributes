@@ -2,9 +2,12 @@
 # Это важно для .ps1 (кодировка/строки) и для сборки темы в CI (Linux).
 * text=auto eol=lf
 
-# PowerShell-скрипты: UTF-8 с BOM обязателен - иначе Windows PowerShell 5.1
-# читает кириллицу как ANSI и падает на парсинге.
-*.ps1 text eol=lf working-tree-encoding=UTF-8-BOM
+# PowerShell-скрипты хранятся в UTF-8 С BOM (BOM - часть содержимого файла).
+# Без BOM Windows PowerShell 5.1 читает кириллицу как ANSI и падает на парсинге.
+# Атрибут working-tree-encoding здесь НЕ используется: git не может
+# перекодировать такие файлы ("failed to encode from UTF-8-BOM to UTF-8"),
+# а байты BOM и так сохраняются в blob как обычное содержимое.
+*.ps1 text eol=lf
 
 # Бинарные файлы
 *.png binary

@@ -3,7 +3,7 @@
   "displayName": "Mori Gruvbox",
   "description": "Gruvbox с нейтральным интерфейсом: подсветка кода Gruvbox, но панели, вкладки и чат — серые, без цветных акцентов. Плюс патч темы для расширения Mozg (mori-code).",
   "version": "1.0.0",
-  "publisher": "vl4dislaw",
+  "publisher": "eterna1-0blivion",
   "license": "MIT",
   "engines": {
     "vscode": "^1.80.0"
@@ -28,12 +28,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vl4dislaw/mori-gruvbox.git"
+    "url": "https://github.com/eterna1-0blivion/mori-gruvbox.git"
   },
   "bugs": {
-    "url": "https://github.com/vl4dislaw/mori-gruvbox/issues"
+    "url": "https://github.com/eterna1-0blivion/mori-gruvbox/issues"
   },
-  "homepage": "https://github.com/vl4dislaw/mori-gruvbox#readme",
+  "homepage": "https://github.com/eterna1-0blivion/mori-gruvbox#readme",
   "contributes": {
     "themes": [
       {
@@ -46,6 +46,7 @@
   "scripts": {
     "build": "node scripts/build-theme.mjs",
     "check": "node scripts/build-theme.mjs --check",
+    "test": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tests/test-settings-block.ps1",
     "package": "npm run build && vsce package --no-dependencies",
     "install:theme": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-vscode-theme.ps1",
     "install:mozg": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-mozg-theme.ps1"

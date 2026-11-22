@@ -22,7 +22,7 @@ Gruvbox с нейтральным интерфейсом: подсветка к�
 ## Установка
 
 ```powershell
-git clone https://github.com/vl4dislaw/mori-gruvbox.git
+git clone https://github.com/eterna1-0blivion/mori-gruvbox.git
 cd mori-gruvbox
 .\scripts\install.ps1
 ```
@@ -69,9 +69,19 @@ Get-ChildItem -Recurse | Unblock-File
 
 Тема VS Code и патч Mozg независимы, но вместе дают цельный вид.
 
-Если в `settings.json` остался прежний блок `"[Gruvbox Dark Hard]"`
-с `workbench.colorCustomizations`, его можно удалить: те же цвета теперь
-внутри темы, а блок действует только на старую Gruvbox.
+### Удаление старого блока настроек
+
+Если раньше вы применяли цвета через `settings.json`, там остался блок:
+
+```jsonc
+"[Gruvbox Dark Hard]": {
+    "workbench.colorCustomizations": { /* 84 цвета */ }
+}
+```
+
+Те же цвета теперь **внутри темы**, поэтому блок дублирует их и действует
+только на старую Gruvbox. `install.ps1` предложит удалить его отдельным
+вопросом сразу после установки темы (с бэкапом `settings.json.bak-mori-gruvbox`).
 
 ## Что именно меняется
 

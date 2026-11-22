@@ -56,7 +56,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$ExtensionId = 'vl4dislaw.mori-gruvbox'
+$ExtensionId = 'eterna1-0blivion.mori-gruvbox'
 $Root = Split-Path -Parent (Split-Path -Parent $PSCommandPath)   # scripts/ -> корень
 
 function Write-Step($text) { Write-Host "`n== $text" -ForegroundColor Cyan }
