@@ -1,0 +1,11 @@
+# Нормализация переводов строк: в репозитории всегда LF.
+# Это важно для .ps1 (кодировка/строки) и для сборки темы в CI (Linux).
+* text=auto eol=lf
+
+# PowerShell-скрипты: UTF-8 с BOM обязателен - иначе Windows PowerShell 5.1
+# читает кириллицу как ANSI и падает на парсинге.
+*.ps1 text eol=lf working-tree-encoding=UTF-8-BOM
+
+# Бинарные файлы
+*.png binary
+*.vsix binary

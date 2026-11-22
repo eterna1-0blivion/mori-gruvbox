@@ -1,0 +1,107 @@
+/* ===== MORI NEUTRAL THEME BEGIN (generated) ===== */
+/*
+ * Нейтральная тема для расширения Mozg / mori-code (mori-ai.mori-code).
+ *
+ * Почему это работает именно так:
+ *   вебвью расширения не наследует тему VS Code, а навязывает свою палитру:
+ *     :root{ --mori-accent:#ff6a1a; --mori-bg:#0d0d0d; ... }
+ *     body { --vscode-sideBar-background:var(--mori-bg); ... }
+ *   поэтому workbench.colorCustomizations на него не влияет.
+ *   Достаточно переопределить --mori-* ниже (unlayered :root с более поздним
+ *   объявлением), и вся палитра, включая производные --vscode-* и --color-cline,
+ *   станет нейтральной.
+ *
+ * Значения подобраны под тёмную нейтраль VS Code (Dark Modern):
+ *   поверхности #181818 / #1f1f1f / #2a2a2a, границы #2b2b2b, текст #cccccc.
+ */
+:root {
+	--mori-accent: #4a4a4a;
+	--mori-accent-hover: #5a5a5a;
+	--mori-accent-ink: #ffffff;
+	--mori-bg: #181818;
+	--mori-surface: #1f1f1f;
+	--mori-surface-2: #2a2a2a;
+	--mori-hover: #2f2f2f;
+	--mori-border: #2b2b2b;
+	--mori-text: #cccccc;
+	--mori-text-muted: #9d9d9d;
+}
+
+/* Акцентный бренд-цвет (#ff6a1a) -> серый. */
+:root,
+:host {
+	--color-cline: #6e6e6e;
+}
+
+/* Рамки, hover и выделение, которые расширение задаёт напрямую. */
+body {
+	--vscode-focusBorder: #4a4a4a;
+	--vscode-list-activeSelectionBackground: #ffffff1f;
+	--vscode-list-activeSelectionForeground: #ffffff;
+	--vscode-scrollbarSlider-background: #ffffff1a;
+	--vscode-scrollbarSlider-hoverBackground: #ffffff26;
+	--vscode-scrollbarSlider-activeBackground: #ffffff33;
+}
+
+/* ---------------------------------------------------------------------------
+ * Градиенты -> плоские заливки.
+ *
+ * VS Code не использует градиенты в интерфейсе, поэтому убираем их и здесь.
+ * Правила идут после Tailwind-утилит и вне @layer, поэтому при равной
+ * специфичности выигрывают по порядку каскада.
+ *
+ * ВАЖНО: mask-image / mask-[linear-gradient(...)] НЕ затрагиваем - это маски
+ * прокрутки, а не декор: плоская заливка обрезала бы текст.
+ * ------------------------------------------------------------------------- */
+
+/* Fade-оверлеи прокрутки (ThinkingRow) и «see more» - просто убираем. */
+.bg-gradient-to-b,
+.bg-gradient-to-t,
+.bg-linear-to-r,
+.bg-linear-90 {
+	background-image: none;
+}
+
+/* Приветственный экран: радиальное свечение акцента -> ровный фон. */
+.mori-welcome {
+	background: var(--mori-bg);
+}
+
+/* Анимированный shimmer-текст («Thinking...»).
+   Исходно это градиент, обрезанный по тексту (bg-clip-text + text-transparent).
+   Снимаем и клип, и прозрачность - иначе текст станет невидимым. */
+.animate-shimmer.bg-clip-text {
+	background-image: none;
+	-webkit-background-clip: border-box;
+	background-clip: border-box;
+	color: var(--vscode-foreground);
+}
+
+/* Инлайновые градиенты (style="...") - они перебивают обычный каскад,
+   поэтому нужен !important.
+
+   Селекторы построены на подстроках, которые присутствуют в атрибуте style
+   при любой сериализации браузером:
+     - "linear-gradient" - сам факт градиента;
+     - "96%"             - признак всплывающего блока авто-одобрений: только
+                           там градиент строится от цвета сайдбара через
+                           color-mix(..., 96%, white);
+     - "mask"            - признак функциональных масок (их НЕ трогаем).
+   Используем background-image, а не shorthand: маски задаются через
+   -webkit-mask-image и не должны попасть под замену. */
+
+/* Всплывающий блок авто-одобрений: градиентный фон -> ровная поверхность
+   из темы VS Code. --vscode-editorWidget-background расширение не
+   переопределяет, поэтому здесь реально наследуется тема редактора
+   (fallback - на случай отсутствия переменной). */
+[style*="linear-gradient"][style*="96%"] {
+	background: var(--vscode-editorWidget-background, var(--vscode-sideBar-background, #1f1f1f)) !important;
+}
+
+/* Все прочие декоративные инлайновые градиенты -> без градиента. */
+[style*="linear-gradient"]:not([style*="mask"]):not([style*="96%"]) {
+	background-image: none !important;
+}
+/* ===== MORI NEUTRAL THEME END ===== */
+
+
