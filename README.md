@@ -12,7 +12,24 @@ Mozg рисует интерфейс в webview со своей палитрой
 
 ## Установка
 
-Из `.vsix` (страница Releases) или из исходников:
+### Способ 1: через интерфейс VS Code (проще всего)
+
+1. Скачайте `.vsix` со страницы
+   [**Releases → v3.1.0**](https://github.com/eterna1-0blivion/mori-gruvbox/releases/latest)
+   (файл `mori-gruvbox-v3.1.0.vsix`).
+2. В VS Code откройте панель расширений (`Ctrl+Shift+X`).
+3. Нажмите `…` в правом верхнем углу панели → **Install from VSIX…**
+4. Выберите скачанный файл и перезагрузите окно (`Ctrl+Shift+R`).
+
+Дальше VS Code сам предложит подключить Mozg к активной теме.
+
+> **Почему не через каталог расширений?** Расширение не опубликовано в
+> Marketplace: `vsce publish` требует зарегистрированного издателя, а у проекта
+> его пока нет. Как только опубликую — установка станет одной кнопкой из
+> каталога, и эта инструкция упростится. Пока `.vsix` из Releases — это тот же
+> файл, который лежит в каталоге, просто скачанный вручную.
+
+### Способ 2: из исходников
 
 ```powershell
 git clone https://github.com/eterna1-0blivion/mori-gruvbox.git
@@ -75,6 +92,17 @@ node scripts/bridge-cli.js status
 node scripts/bridge-cli.js apply
 node scripts/bridge-cli.js revert
 ```
+
+### Удаление расширения
+
+Через интерфейс VS Code (панель расширений → шестерёнка → Uninstall) или:
+
+```powershell
+.\scripts\install.ps1 -Uninstall
+```
+
+Файл стилей Mozg при этом не трогается — чтобы вернуть его в исходное
+состояние, выполните `node scripts/bridge-cli.js revert` до удаления.
 
 ## Разработка
 
