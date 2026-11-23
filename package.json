@@ -89,7 +89,7 @@
     }
   },
   "scripts": {
-    "test": "node --test \"test/**/*.test.js\"",
+    "test": "node --test test/bridge.test.js test/browser.test.js test/extension.test.js",
     "icon": "node scripts/make-icon.mjs",
     "package": "vsce package --no-dependencies",
     "install:local": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1"
