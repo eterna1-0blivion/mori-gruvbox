@@ -8,6 +8,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Для шага Attach .vsix to release (softprops/action-gh-release) нужен доступ
+# на запись в Contents; по умолчанию GITHUB_TOKEN выдаёт только чтение.
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
